@@ -159,13 +159,13 @@ process.externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
 ###### Filters ##########
 tagfilter = cms.EDFilter(
     "PythiaDauVFilter",
-    ParticleID         = cms.untracked.int32(511),  ## B0
+    ParticleID         = cms.untracked.int32(25),  ## B0
     ChargeConjugation  = cms.untracked.bool(False),
-    NumberDaughters    = cms.untracked.int32(3),
-    DaughterIDs        = cms.untracked.vint32(-413, -13, 14),
-    MinPt              = cms.untracked.vdouble(-1., 6.5, -1.),
-    MinEta             = cms.untracked.vdouble(-9999999., -2.5, -9999999.),
-    MaxEta             = cms.untracked.vdouble( 9999999.,  2.5, 9999999.)
+    NumberDaughters    = cms.untracked.int32(2),
+    DaughterIDs        = cms.untracked.vint32(22, 5),
+    MinPt              = cms.untracked.vdouble(300., 300.),
+    MinEta             = cms.untracked.vdouble(-9999999., -9999999.),
+    MaxEta             = cms.untracked.vdouble( 9999999., 9999999.)
 )
 
 ProductionFilterSequence = cms.Sequence(generator + tagfilter)
