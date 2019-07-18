@@ -156,8 +156,19 @@ process.externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
     scriptName = cms.FileInPath('GeneratorInterface/LHEInterface/data/run_generic_tarball_cvmfs.sh')
 )
 
+###### Filters ##########
+tagfilter = cms.EDFilter(
+    "PythiaDauVFilter",
+    ParticleID         = cms.untracked.int32(511),  ## B0
+    ChargeConjugation  = cms.untracked.bool(False),
+    NumberDaughters    = cms.untracked.int32(3),
+    DaughterIDs        = cms.untracked.vint32(-413, -13, 14),
+    MinPt              = cms.untracked.vdouble(-1., 6.5, -1.),
+    MinEta             = cms.untracked.vdouble(-9999999., -2.5, -9999999.),
+    MaxEta             = cms.untracked.vdouble( 9999999.,  2.5, 9999999.)
+)
 
-process.ProductionFilterSequence = cms.Sequence(process.generator)
+ProductionFilterSequence = cms.Sequence(generator + tagfilter)
 
 # Path and EndPath definitions
 process.lhe_step = cms.Path(process.externalLHEProducer)
