@@ -26,7 +26,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100)
+    input = cms.untracked.int32(1000)
 )
 
 # Input source
@@ -92,7 +92,6 @@ process.generator = cms.EDFilter("Pythia8HadronizerFilter",
             '25:onMode = off', 
             '25:onIfMatch = 5 -5', 
 	    '25:onIfMatch = 22 22', 
-            '25:pTHatMin = 300.',
 	    'ResonanceDecayFilter:filter = on', 
             'ResonanceDecayFilter:exclusive = on', 
             'ResonanceDecayFilter:mothers = 25', 
@@ -150,25 +149,24 @@ process.generator = cms.EDFilter("Pythia8HadronizerFilter",
 
 process.externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
     args = cms.vstring('/cvmfs/cms.cern.ch/phys_generator/gridpacks/2017/13TeV/madgraph/V5_2.4.2/GF_HH_SM/v1/GF_HH_SM_slc6_amd64_gcc481_CMSSW_7_1_30_tarball.tar.xz'),
-    nEvents = cms.untracked.uint32(100),
+    nEvents = cms.untracked.uint32(1000),
     numberOfParameters = cms.uint32(1),
     outputFile = cms.string('cmsgrid_final.lhe'),
     scriptName = cms.FileInPath('GeneratorInterface/LHEInterface/data/run_generic_tarball_cvmfs.sh')
 )
 
-###### Filters ##########
-tagfilter = cms.EDFilter(
+######Filters############
+process.tagfilter = cms.EDFilter(
     "PythiaDauVFilter",
     ParticleID         = cms.untracked.int32(25),  ## B0
-    ChargeConjugation  = cms.untracked.bool(False),
     NumberDaughters    = cms.untracked.int32(2),
-    DaughterIDs        = cms.untracked.vint32(22, 5),
+    DaughterIDs        = cms.untracked.vint32(25,25),
     MinPt              = cms.untracked.vdouble(300., 300.),
     MinEta             = cms.untracked.vdouble(-9999999., -9999999.),
     MaxEta             = cms.untracked.vdouble( 9999999., 9999999.)
 )
 
-ProductionFilterSequence = cms.Sequence(generator + tagfilter)
+process.ProductionFilterSequence = cms.Sequence(process.generator + process.tagfilter)
 
 # Path and EndPath definitions
 process.lhe_step = cms.Path(process.externalLHEProducer)
