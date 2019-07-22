@@ -91,11 +91,7 @@ process.generator = cms.EDFilter("Pythia8HadronizerFilter",
             '25:m0 = 125.0', 
             '25:onMode = off', 
             '25:onIfMatch = 5 -5', 
-	    '25:onIfMatch = 22 22', 
-	    'ResonanceDecayFilter:filter = on', 
-            'ResonanceDecayFilter:exclusive = on', 
-            'ResonanceDecayFilter:mothers = 25', 
-            'ResonanceDecayFilter:daughters = 5,5,22,22'
+	    '25:onIfMatch = 22 22',
         ),
         pythia8CP5Settings = cms.vstring(
             'Tune:pp 14', 
@@ -157,16 +153,15 @@ process.externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
 
 ######Filters############
 process.tagfilter = cms.EDFilter(
-    "PythiaDauVFilter",
+    "PythiaFilter",
     ParticleID         = cms.untracked.int32(25),  ## B0
-    NumberDaughters    = cms.untracked.int32(2),
-    DaughterIDs        = cms.untracked.vint32(25,25),
-    MinPt              = cms.untracked.vdouble(300., 300.),
-    MinEta             = cms.untracked.vdouble(-9999999., -9999999.),
-    MaxEta             = cms.untracked.vdouble( 9999999., 9999999.)
+    MinPt              = cms.untracked.double(300.),
+    MinEta             = cms.untracked.double(-9999999.),
+    MaxEta             = cms.untracked.double( 9999999.)
 )
 
 process.ProductionFilterSequence = cms.Sequence(process.generator + process.tagfilter)
+#process.ProductionFilterSequence = cms.Sequence(process.generator)
 
 # Path and EndPath definitions
 process.lhe_step = cms.Path(process.externalLHEProducer)
@@ -183,7 +178,7 @@ from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 
 #Setup FWK for multithreaded
-process.options.numberOfThreads=cms.untracked.uint32(8)
+process.options.numberOfThreads=cms.untracked.uint32(16)
 process.options.numberOfStreams=cms.untracked.uint32(0)
 # filter all path with the production filter sequence
 for path in process.paths:
