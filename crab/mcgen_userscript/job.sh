@@ -23,8 +23,8 @@ source /cvmfs/cms.cern.ch/cmsset_default.sh
 
 #set up CMSSW
 #cmsrel
-scramv1 project CMSSW CMSSW_10_2_3
-cd CMSSW_10_2_3/src
+scramv1 project CMSSW CMSSW_10_2_6
+cd CMSSW_10_2_6/src
 
 #cmsenv
 eval `scramv1 runtime -sh`
