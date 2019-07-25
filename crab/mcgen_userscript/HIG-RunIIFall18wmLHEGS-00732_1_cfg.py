@@ -26,7 +26,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(10000)
 )
 
 # Input source
@@ -93,7 +93,7 @@ process.generator = cms.EDFilter("Pythia8HadronizerFilter",
             '25:onIfMatch = 5 -5', 
 	    '25:onIfMatch = 22 22',
 	    'ResonanceDecayFilter:filter = on', 
-            'ResonanceDecayFilter:exclusive = on', 
+	    'ResonanceDecayFilter:exclusive = on', 
             'ResonanceDecayFilter:mothers = 25', 
             'ResonanceDecayFilter:daughters = 5,5,22,22'
         ),
@@ -149,23 +149,46 @@ process.generator = cms.EDFilter("Pythia8HadronizerFilter",
 
 process.externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
     args = cms.vstring('/cvmfs/cms.cern.ch/phys_generator/gridpacks/2017/13TeV/madgraph/V5_2.4.2/GF_HH_SM/v1/GF_HH_SM_slc6_amd64_gcc481_CMSSW_7_1_30_tarball.tar.xz'),
-    nEvents = cms.untracked.uint32(1000),
+    nEvents = cms.untracked.uint32(10000),
     numberOfParameters = cms.uint32(1),
     outputFile = cms.string('cmsgrid_final.lhe'),
     scriptName = cms.FileInPath('GeneratorInterface/LHEInterface/data/run_generic_tarball_cvmfs.sh')
 )
 
 ######Filters############
+
+###### Not Used ##################
 process.tagfilter = cms.EDFilter(
     "PythiaFilter",
     ParticleID         = cms.untracked.int32(25),  ## B0
-    MinPt              = cms.untracked.double(300.),
+    MinPt              = cms.untracked.double(200.),
+    NumberDaughters    = cms.untracked.int32(2),
+    DaughterIDs        = cms.untracked.vint32(-5, 5),
     MinEta             = cms.untracked.double(-9999999.),
     MaxEta             = cms.untracked.double( 9999999.)
+)   
+  
+####### Not Used ###############	
+process.tagfilterDauV = cms.EDFilter(
+    "PythiaDauVFilter",
+    ParticleID         = cms.untracked.int32(25),  ## B0
+    NumberDaughters    = cms.untracked.int32(2),
+    DaughterIDs        = cms.untracked.vint32(-5, 5),
+    MinPt              = cms.untracked.vdouble(100., 100.),
+    MinEta             = cms.untracked.vdouble(-9999999., -9999999.),
+    MaxEta             = cms.untracked.vdouble( 9999999., 9999999.)
 )
 
-process.ProductionFilterSequence = cms.Sequence(process.generator + process.tagfilter)
-#process.ProductionFilterSequence = cms.Sequence(process.generator)
+######## Used #################
+process.tagfilterMomDau = cms.EDFilter(
+    "PythiaMomDauFilter",
+    ParticleID          = cms.untracked.int32(25), 
+    NumberDaughters     = cms.untracked.int32(2),
+    DaughterIDs         = cms.untracked.vint32(-5, 5), 
+    MomMinPt            = cms.untracked.double(200.)
+)
+
+process.ProductionFilterSequence = cms.Sequence(process.generator + process.tagfilterMomDau)
 
 # Path and EndPath definitions
 process.lhe_step = cms.Path(process.externalLHEProducer)
@@ -182,7 +205,7 @@ from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 
 #Setup FWK for multithreaded
-process.options.numberOfThreads=cms.untracked.uint32(16)
+process.options.numberOfThreads=cms.untracked.uint32(24)
 process.options.numberOfStreams=cms.untracked.uint32(0)
 # filter all path with the production filter sequence
 for path in process.paths:
